@@ -84,7 +84,7 @@ Este proyecto es **estático**, por lo tanto no requiere backend. Puedes:
 1. Clonar el repositorio:
 
 ```bash
-git clone https://github.com/tu_usuario/arsenal-hacking.git
+git clone https://github.com/h4ck3nd/hackingGadgets.git
 ```
 
 2. Abrir el archivo index.html directamente en tu navegador.
