@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacking WiFi Casero - Ethical Hacking Gadgets</title>
+    <link rel="icon" href="img/whitehat.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0B0B0B;
+            --card-bg: #1A1A1A;
+            --border-color: #444;
+            --neon-green: #00FF9C;
+            --ice-blue: #6EC3F4;
+            --text-light: #CCCCCC;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg-dark);
+            color: white;
+            overflow-x: hidden;
+            cursor: none !important;
+        }
+
+        * {
+            cursor: none !important;
+        }
+        
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+            mix-blend-mode: difference;
+        }
+        
+        .custom-cursor.active {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .custom-cursor.click {
+            animation: clickEffect 0.3s ease;
+        }
+        
+        @keyframes clickEffect {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(0.8); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 156, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .terminal-prompt {
+            position: relative;
+        }
+        
+        .terminal-prompt::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            width: 8px;
+            height: 24px;
+            background-color: var(--neon-green);
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        .data-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.03;
+        }
+        
+        .data-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            animation: moveLine 8s linear infinite;
+        }
+        
+        @keyframes moveLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .hex-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(110, 195, 244, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 156, 0.03) 0%, transparent 20%);
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .hex-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, transparent 0%, rgba(0, 255, 156, 0.02) 50%, transparent 100%),
+                linear-gradient(180deg, transparent 0%, rgba(110, 195, 244, 0.02) 50%, transparent 100%);
+            animation: hexMove 20s linear infinite;
+        }
+        
+        @keyframes hexMove {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5%, 5%); }
+            50% { transform: translate(0, 10%); }
+            75% { transform: translate(5%, 5%); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff3e3e;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--neon-green);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .tag-wifi {
+            background-color: rgba(0, 255, 156, 0.1);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+        
+        .tag-usb {
+            background-color: rgba(110, 195, 244, 0.1);
+            border: 1px solid var(--ice-blue);
+            color: var(--ice-blue);
+        }
+        
+        .tag-rfid {
+            background-color: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+        }
+        
+        .tag-sdr {
+            background-color: rgba(255, 165, 0, 0.1);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--neon-green);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item.active::after {
+            width: 100%;
+            animation: blink 1s step-end infinite;
+        }
+        
+        .uptime-counter {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-green);
+        }
+        
+        .total-counter {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-green);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 5px rgba(0, 255, 156, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(0, 255, 156, 0.8); }
+            100% { text-shadow: 0 0 5px rgba(0, 255, 156, 0.5); }
+        }
+        
+        .hidden-link {
+            color: transparent;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .hidden-link:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 12px rgba(0, 255, 156, 0.7);
+        }
+        
+        .step-card {
+            border-left: 3px solid var(--neon-green);
+            background-color: rgba(0, 255, 156, 0.05);
+        }
+        
+        .step-number {
+            background-color: var(--neon-green);
+            color: var(--bg-dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--card-bg);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--neon-green);
+            font-size: 0.8rem;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                cursor: none !important;
+            }
+            
+            .terminal-prompt::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+    <!-- Custom cursor -->
+    <div class="custom-cursor"></div>
+    
+    <!-- Background elements -->
+    <div class="data-line"></div>
+    <div class="hex-bg"></div>
+    
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-white terminal-prompt">
+                <span class="text-neon-green">root@hackbox</span>:<span class="text-ice-blue">~/wifi-hacking</span>#
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="../index.html" class="nav-item text-gray-400 hover:text-white uppercase text-sm tracking-wider">Inicio</a>
+                <a href="#" class="nav-item active text-white uppercase text-sm tracking-wider">WiFi Hacking</a>
+                <a href="#" class="nav-item text-gray-400 hover:text-white uppercase text-sm tracking-wider">RFID Tools</a>
+                <a href="#" class="nav-item text-gray-400 hover:text-white uppercase text-sm tracking-wider">USB Gadgets</a>
+            </div>
+            <div class="md:hidden">
+                <button class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2 text-white glitch-effect" data-text="📡 HACKING WIFI CASERO">📡 HACKING WIFI CASERO</h1>
+            <p class="text-gray-400 max-w-3xl mx-auto">
+                Guía completa para construir tu propio kit de pruebas WiFi con dispositivos asequibles. Aprende los fundamentos de seguridad inalámbrica de forma ética.
+            </p>
+            
+            <!-- Total counter -->
+            <div class="mt-8 p-4 border border-gray-800 rounded-lg inline-block bg-black bg-opacity-50">
+                <div class="flex items-center">
+                    <span class="text-gray-400 mr-2">↳</span>
+                    <span class="text-gray-300">Costo total estimado:</span>
+                    <span class="total-counter ml-2 font-bold">$0.00</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Introduction -->
+        <section class="mb-12 bg-gray-900 bg-opacity-50 border border-gray-800 rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-neon-green">⚠️ ADVERTENCIA LEGAL</h2>
+            <p class="text-gray-400 mb-4">
+                Esta guía es solo con fines educativos y de investigación en seguridad. El hacking WiFi sin autorización explícita es ilegal en la mayoría de países. Solo prueba redes propias o con permiso por escrito.
+            </p>
+            <p class="text-gray-400">
+                Los dispositivos mostrados pueden ser utilizados para auditorías de seguridad, pruebas de penetración éticas y aprendizaje sobre vulnerabilidades en redes inalámbricas.
+            </p>
+        </section>
+        
+        <!-- Steps section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-white border-b border-gray-800 pb-2">📋 PASOS PARA CONSTRUIR TU KIT</h2>
+            
+            <!-- Step 1 -->
+            <div class="step-card rounded-lg p-5 mb-6 flex items-start">
+                <div class="step-number">1</div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-2">Selecciona tu dispositivo principal</h3>
+                    <p class="text-gray-400 mb-4">
+                        Necesitarás un dispositivo con capacidad WiFi que pueda ejecutar herramientas de seguridad. Las mejores opciones son:
+                    </p>
+                    <ul class="text-gray-400 list-disc pl-5 mb-4">
+                        <li class="mb-2"><span class="text-neon-green">ESP8266/ESP32</span> - Económicos y versátiles para proyectos básicos</li>
+                        <li class="mb-2"><span class="text-neon-green">Raspberry Pi</span> - Potente y compatible con Kali Linux</li>
+                        <li class="mb-2"><span class="text-neon-green">Dispositivos especializados</span> - Como el WiFi Pineapple para profesionales</li>
+                    </ul>
+                    <p class="text-gray-400">
+                        <span class="text-ice-blue tooltip">¿Cuál elegir?
+                            <span class="tooltiptext">Para principiantes recomendamos ESP8266 por su bajo costo y facilidad de uso</span>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Step 2 -->
+            <div class="step-card rounded-lg p-5 mb-6 flex items-start">
+                <div class="step-number">2</div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-2">Instala el software necesario</h3>
+                    <p class="text-gray-400 mb-4">
+                        Dependiendo de tu dispositivo, necesitarás diferentes herramientas:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-bold text-neon-green mb-2">ESP8266/ESP32</h4>
+                            <ul class="text-gray-400 text-sm list-disc pl-5">
+                                <li>Arduino IDE</li>
+                                <li>ESP8266/ESP32 Core</li>
+                                <li>Biblioteca WiFi</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-bold text-neon-green mb-2">Raspberry Pi</h4>
+                            <ul class="text-gray-400 text-sm list-disc pl-5">
+                                <li>Kali Linux</li>
+                                <li>Aircrack-ng suite</li>
+                                <li>Reaver</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-bold text-neon-green mb-2">Dispositivos Especializados</h4>
+                            <ul class="text-gray-400 text-sm list-disc pl-5">
+                                <li>Firmware específico</li>
+                                <li>Herramientas del fabricante</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="text-gray-400">
+                        Todas estas herramientas son de código abierto y disponibles gratuitamente.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Step 3 -->
+            <div class="step-card rounded-lg p-5 mb-6 flex items-start">
+                <div class="step-number">3</div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-2">Configura tu entorno</h3>
+                    <p class="text-gray-400 mb-4">
+                        Prepara tu espacio de trabajo con estos elementos esenciales:
+                    </p>
+                    <ul class="text-gray-400 list-disc pl-5 mb-4">
+                        <li class="mb-2"><span class="text-neon-green">Adaptador WiFi compatible</span> - Debe soportar modo monitor e inyección de paquetes</li>
+                        <li class="mb-2"><span class="text-neon-green">Antena externa</span> - Para mejorar el alcance (opcional pero recomendado)</li>
+                        <li class="mb-2"><span class="text-neon-green">Cables y conectores</span> - Según tus necesidades de conexión</li>
+                        <li class="mb-2"><span class="text-neon-green">Fuente de alimentación</span> - Para pruebas móviles</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Step 4 -->
+            <div class="step-card rounded-lg p-5 flex items-start">
+                <div class="step-number">4</div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-2">Aprende los fundamentos</h3>
+                    <p class="text-gray-400 mb-4">
+                        Antes de comenzar, familiarízate con estos conceptos clave:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-bold text-neon-green mb-2">Protocolos WiFi</h4>
+                            <ul class="text-gray-400 text-sm">
+                                <li class="mb-1">· WEP (inseguro)</li>
+                                <li class="mb-1">· WPA/WPA2-PSK</li>
+                                <li class="mb-1">· WPA3 (más seguro)</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="font-bold text-neon-green mb-2">Técnicas comunes</h4>
+                            <ul class="text-gray-400 text-sm">
+                                <li class="mb-1">· Captura de handshake</li>
+                                <li class="mb-1">· Ataques de deautenticación</li>
+                                <li class="mb-1">· Fuerza bruta</li>
+                                <li class="mb-1">· Evil Twin</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recommended products -->
+        <section>
+            <h2 class="text-2xl font-bold mb-6 text-white border-b border-gray-800 pb-2">🛒 PRODUCTOS RECOMENDADOS</h2>
+            <p class="text-gray-400 mb-8">
+                Estos son los dispositivos esenciales para comenzar con el hacking WiFi ético. Marca los que ya tienes para calcular el costo total.
+            </p>
+            
+            <!-- LINK VIDEO: https://youtu.be/lcokJQMivwY?si=uQKtiePvBWnYaYqZ -->
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Product 1 - ESP32 Marauder Firmware -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="ESP32 MARAUDER">ESP32 MARAUDER</h3>
+                        <span class="text-neon-green font-bold">$00.00</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fpngimg.com%2Fuploads%2Fgithub%2Fgithub_PNG80.png&f=1&nofb=1&ipt=fd1a1528c5d188cde9339fcd6b31240705102bc89cc386c974d9b30a0bf9c657" alt="ESP32 Marauder Firmware" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Suite avanzada de seguridad WiFi para ESP32. Incluye herramientas para sniffing, deautenticación, ataques Evil Portal y análisis de redes. Compatible con dispositivos ESP-WROOM-32.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="0.00" checked>
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://github.com/justcallmekoko/ESP32Marauder" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="DESCARGAR EN GITHUB">DESCARGAR EN GITHUB</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-wifi">WiFi</span>
+                        <span class="tag tag-firmware">Firmware</span>
+                        <span class="tag tag-security">Pentesting</span>
+                        <span class="tag tag-opensource">Open Source</span>
+                    </div>
+                </div>
+                
+                <!-- Product 2 - WWZMDiB TFT LCD Touch -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="TFT LCD TOUCH">TFT LCD TOUCH</h3>
+                        <span class="text-neon-green font-bold">$12.99</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.electrohobby.org%2Fwp-content%2Fuploads%2F2015%2F03%2F1-TFTFrontBack.png&f=1&nofb=1&ipt=a0ed17e0d69c1dcc34fdef31cd76fca806bcd7f4fe7794209b672b5be17b4654" alt="WWZMDiB TFT LCD Touch" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Pantalla TFT LCD táctil de 2.4" con interfaz SPI. Ideal para proyectos con Arduino, Raspberry Pi y microcontroladores, compatible con bibliotecas estándar para desarrollo rápido.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="12.99">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://a.co/d/ciS0aNh" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-tft">TFT 2.4"</span>
+                        <span class="tag tag-touch">Touch</span>
+                        <span class="tag tag-spi">SPI</span>
+                        <span class="tag tag-diy">DIY</span>
+                    </div>
+                </div>
+                
+                <!-- Product 3 - ESP-WROOM-32 -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="ESP-WROOM-32">ESP-WROOM-32</h3>
+                        <span class="text-neon-green font-bold">$8.99</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Frepository-images.githubusercontent.com%2F289585733%2Faca18380-f8fa-11ea-978f-b2706a3f3116&f=1&nofb=1&ipt=284354ed35814224766b6133472eb1283b4182ed0e7598afbf60c7203bd955c4" alt="ESP-WROOM-32" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Módulo WiFi/Bluetooth de bajo costo basado en ESP32. Ideal para prototipos IoT, proyectos de seguridad WiFi y desarrollo de herramientas personalizadas con Arduino IDE o MicroPython.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="8.99">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://a.co/d/8oKUPsu" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-esp32">ESP32</span>
+                        <span class="tag tag-wifi">WiFi/BT</span>
+                        <span class="tag tag-iot">IoT</span>
+                        <span class="tag tag-diy">DIY</span>
+                    </div>
+                </div>
+                
+                <!-- Product 4 - ELEGOO Breadboard -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="ELEGOO BREADBOARD">ELEGOO BREADBOARD</h3>
+                        <span class="text-neon-green font-bold">$6.98</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.robotroom.com%2FSolderless-Breadboards%2FColor-solderless-breadboards-(red%2C-blue%2C-black%2C%2520and-green)-with%2520170-tie-points.png&f=1&nofb=1&ipt=e90c8b05c04ceb6fb12b0ff065fdc5eaa3b79c2fdcf60a98a3251f30b55e1323" alt="ELEGOO Breadboard" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Protoboard sin soldadura de 400 puntos con distribución de alimentación. Ideal para prototipado rápido de circuitos electrónicos y proyectos con Arduino, ESP32 y otros microcontroladores.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="6.98">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://a.co/d/3duAaB0" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-breadboard">400 Puntos</span>
+                        <span class="tag tag-prototyping">Prototipado</span>
+                        <span class="tag tag-diy">Electrónica</span>
+                        <span class="tag tag-arduino">Arduino</span>
+                    </div>
+                </div>
+                
+                <!-- Product 5 - AUSTOR Cable Kit -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="AUSTOR KIT">AUSTOR KIT</h3>
+                        <span class="text-neon-green font-bold">$9.99</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="../img/cables.png" alt="AUSTOR Cable Kit" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Kit completo de cables Dupont (hembra-hembra, macho-hembra, macho-macho) para prototipado electrónico. Ideal para conectar placas Arduino, ESP32 y otros componentes en protoboards.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="9.99">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://a.co/d/0Z8I9kq" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-cables">40 Cables</span>
+                        <span class="tag tag-dupont">Dupont</span>
+                        <span class="tag tag-prototyping">Prototipado</span>
+                        <span class="tag tag-arduino">Arduino</span>
+                    </div>
+                </div>
+                
+                <!-- Product 6 - AUSTOR Pin Header Kit -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="AUSTOR PIN KIT">AUSTOR PIN KIT</h3>
+                        <span class="text-neon-green font-bold">$6.99</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="../img/pines.png" alt="AUSTOR Pin Header Kit" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Kit completo de pines de conexión (macho y hembra) en variedad de tamaños. Incluye cabezales de 40 pines para prototipado con Arduino, ESP32 y otras placas de desarrollo.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="6.99">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://a.co/d/d4NlxWj" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-pines">Pines</span>
+                        <span class="tag tag-headers">Cabezales</span>
+                        <span class="tag tag-prototyping">Prototipado</span>
+                        <span class="tag tag-arduino">Arduino</span>
+                    </div>
+                </div>
+
+                <!-- Product 7 - Bridas blancas -->
+                <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white glitch-effect" data-text="BRIDAS BLANCAS">BRIDAS BLANCAS</h3>
+                        <span class="text-neon-green font-bold">$2.79</span>
+                    </div>
+                    <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.adeo.com%2Fmedia%2F1881668%2Fmedia.png%3Fwidth%3D640&f=1&nofb=1&ipt=776b4a5e7044ac1958c0bd43655dc38172ed8099f427251c0fbf4ff8b4ce8185" alt="Bridas blancas" class="w-full h-full object-contain">
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Pack de 100 bridas blancas de nylon de 15cm. Ideales para organización de cables, montaje de proyectos electrónicos y fijación de componentes en tus creaciones DIY.
+                    </p>
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="flex items-center cursor-pointer">
+                            <div class="toggle-switch mr-2">
+                                <input type="checkbox" class="gadget-toggle" data-price="2.79">
+                                <span class="toggle-slider"></span>
+                            </div>
+                            <span class="text-gray-400 text-sm">Ya lo tengo</span>
+                        </label>
+                        <a href="https://a.co/d/ggN0rSa" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                    </div>
+                    <div class="flex flex-wrap">
+                        <span class="tag tag-cable">Organización</span>
+                        <span class="tag tag-diy">DIY</span>
+                        <span class="tag tag-ties">100 Unidades</span>
+                        <span class="tag tag-nylon">Nylon</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Additional resources -->
+        <section class="mt-12">
+            <h2 class="text-2xl font-bold mb-6 text-white border-b border-gray-800 pb-2">📚 RECURSOS ADICIONALES</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-900 bg-opacity-50 border border-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-3 text-neon-green">Libros recomendados</h3>
+                    <ul class="text-gray-400">
+                        <li class="mb-2">· "The Hacker Playbook 3" - Peter Kim</li>
+                        <li class="mb-2">· "WiFi Hacking for Beginners" - James Wells</li>
+                        <li class="mb-2">· "Advanced Wireless Attacks" - Vivek Ramachandran</li>
+                    </ul>
+                </div>
+                <div class="bg-gray-900 bg-opacity-50 border border-gray-800 rounded-lg p-6">
+                    <h3 class="text-xl font-bold mb-3 text-neon-green">Cursos online</h3>
+                    <ul class="text-gray-400">
+                        <li class="mb-2">· "WiFi Penetration Testing" - Udemy</li>
+                        <li class="mb-2">· "Wireless Security & Ethical Hacking" - Cybrary</li>
+                        <li class="mb-2">· "Practical Ethical Hacking" - TCM Security</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 border-t border-gray-800 py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-500 text-sm mb-4 md:mb-0">
+                    <span class="uptime-counter">UPTIME: 427H</span>
+                    <span class="mx-2">|</span>
+                    <span>IP: 192.168.1.<span id="random-ip">x</span></span>
+                </div>
+                <div class="text-gray-500 text-sm">
+                    <span class="hidden-link" data-secret="decrypt">45 74 68 69 63 61 6C 20 48 61 63 6B 69 6E 67 20 4F 6E 6C 79</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Custom cursor
+        const cursor = document.querySelector('.custom-cursor');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        document.querySelectorAll('a, button, .gadget-toggle').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('active');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('active');
+            });
+        });
+        
+        document.addEventListener('click', () => {
+            cursor.classList.add('click');
+            setTimeout(() => {
+                cursor.classList.remove('click');
+            }, 300);
+        });
+        
+        // Random IP generator
+        document.getElementById('random-ip').textContent = Math.floor(Math.random() * 254) + 1;
+        
+        // Total counter functionality - sums all unpurchased items
+        const toggles = document.querySelectorAll('.gadget-toggle');
+        const totalCounter = document.querySelector('.total-counter');
+        
+        function calculateTotal() {
+            let total = 0;
+            toggles.forEach(toggle => {
+                if (!toggle.checked) {
+                    total += parseFloat(toggle.getAttribute('data-price'));
+                }
+            });
+            totalCounter.textContent = `$${total.toFixed(2)}`;
+        }
+        
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', calculateTotal);
+        });
+        
+        // Initialize total
+        calculateTotal();
+        
+        // Secret message hover effect
+        const secretMessage = document.querySelector('.hidden-link');
+        
+        secretMessage.addEventListener('mouseenter', function() {
+            const hex = this.textContent.trim().split(' ');
+            let message = '';
+            
+            hex.forEach(h => {
+                message += String.fromCharCode(parseInt(h, 16));
+            });
+            
+            this.setAttribute('data-original', this.textContent);
+            this.textContent = message;
+        });
+        
+        secretMessage.addEventListener('mouseleave', function() {
+            this.textContent = this.getAttribute('data-original');
+        });
+        
+        // Animate cards on scroll
+        const animateOnScroll = () => {
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (cardPosition < screenPosition) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+    </script>
+</body>
+</html>

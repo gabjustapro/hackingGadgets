@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gadgets Hacking</title>
+    <link rel="icon" href="img/whitehat.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0B0B0B;
+            --card-bg: #1A1A1A;
+            --border-color: #444;
+            --neon-green: #00FF9C;
+            --ice-blue: #6EC3F4;
+            --text-light: #CCCCCC;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg-dark);
+            color: white;
+            overflow-x: hidden;
+            cursor: none !important;
+        }
+
+        * {
+            cursor: none !important;
+        }
+        
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease;
+            mix-blend-mode: difference;
+        }
+        
+        .custom-cursor.active {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .custom-cursor.click {
+            animation: clickEffect 0.3s ease;
+        }
+        
+        @keyframes clickEffect {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(0.8); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 156, 0.2);
+            transform: translateY(-5px);
+        }
+        
+        .terminal-prompt {
+            position: relative;
+        }
+        
+        .terminal-prompt::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            width: 8px;
+            height: 24px;
+            background-color: var(--neon-green);
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        .data-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.03;
+        }
+        
+        .data-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            animation: moveLine 8s linear infinite;
+        }
+        
+        @keyframes moveLine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .hex-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(110, 195, 244, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 156, 0.03) 0%, transparent 20%);
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .hex-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, transparent 0%, rgba(0, 255, 156, 0.02) 50%, transparent 100%),
+                linear-gradient(180deg, transparent 0%, rgba(110, 195, 244, 0.02) 50%, transparent 100%);
+            animation: hexMove 20s linear infinite;
+        }
+        
+        @keyframes hexMove {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(-5%, 5%); }
+            50% { transform: translate(0, 10%); }
+            75% { transform: translate(5%, 5%); }
+            100% { transform: translate(0, 0); }
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ff3e3e;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--neon-green);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        
+        .tag-wifi {
+            background-color: rgba(0, 255, 156, 0.1);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+        
+        .tag-usb {
+            background-color: rgba(110, 195, 244, 0.1);
+            border: 1px solid var(--ice-blue);
+            color: var(--ice-blue);
+        }
+        
+        .tag-rfid {
+            background-color: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+        }
+        
+        .tag-sdr {
+            background-color: rgba(255, 165, 0, 0.1);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--neon-green);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item.active::after {
+            width: 100%;
+            animation: blink 1s step-end infinite;
+        }
+        
+        .uptime-counter {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-green);
+        }
+        
+        .total-counter {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-green);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 5px rgba(0, 255, 156, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(0, 255, 156, 0.8); }
+            100% { text-shadow: 0 0 5px rgba(0, 255, 156, 0.5); }
+        }
+        
+        .hidden-link {
+            color: transparent;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .hidden-link:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 12px rgba(0, 255, 156, 0.7);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                cursor: none !important;
+            }
+            
+            .terminal-prompt::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden">
+    <!-- Custom cursor -->
+    <div class="custom-cursor"></div>
+    
+    <!-- Background elements -->
+    <div class="data-line"></div>
+    <div class="hex-bg"></div>
+    
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-white terminal-prompt">
+                <span class="text-neon-green">root@hackbox</span>:<span class="text-ice-blue">~/arsenal</span>#
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#" class="nav-item active text-white uppercase text-sm tracking-wider">Arsenal</a>
+                <a href="#" class="nav-item text-gray-400 hover:text-white uppercase text-sm tracking-wider">Herramientas</a>
+                <a href="#" class="nav-item text-gray-400 hover:text-white uppercase text-sm tracking-wider">Merchandaising</a>
+                <a href="#" class="nav-item text-gray-400 hover:text-white uppercase text-sm tracking-wider">Tools Caseras</a>
+            </div>
+            <div class="md:hidden">
+                <button class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2 text-white glitch-effect" data-text="🎛️ ARSENAL FÍSICO DE HACKING ÉTICO">🎛️ ARSENAL FÍSICO DE HACKING ÉTICO</h1>
+            <p class="text-gray-400 max-w-3xl mx-auto">
+                Explora nuestra colección táctica de dispositivos reales utilizados por profesionales del hacking ético. Cada herramienta incluye precio, estado de compra, y acceso al proveedor original.
+            </p>
+            
+            <!-- Total counter -->
+            <div class="mt-8 p-4 border border-gray-800 rounded-lg inline-block bg-black bg-opacity-50">
+                <div class="flex items-center">
+                    <span class="text-gray-400 mr-2">↳</span>
+                    <span class="text-gray-300">Total invertido:</span>
+                    <span class="total-counter ml-2 font-bold">$0.00</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Category filter -->
+        <div class="mb-8 flex flex-wrap justify-center gap-2">
+            <button class="px-4 py-2 bg-gray-900 text-white rounded-full border border-gray-700 hover:border-neon-green hover:text-neon-green transition-all">Todos</button>
+            <button class="px-4 py-2 bg-gray-900 text-white rounded-full border border-gray-700 hover:border-neon-green hover:text-neon-green transition-all">RF Tools</button>
+            <button class="px-4 py-2 bg-gray-900 text-white rounded-full border border-gray-700 hover:border-neon-green hover:text-neon-green transition-all">USB Attacks</button>
+            <button class="px-4 py-2 bg-gray-900 text-white rounded-full border border-gray-700 hover:border-neon-green hover:text-neon-green transition-all">Wi-Fi</button>
+            <button class="px-4 py-2 bg-gray-900 text-white rounded-full border border-gray-700 hover:border-neon-green hover:text-neon-green transition-all">Data Exfiltration</button>
+        </div>
+        
+        <!-- Gadgets grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Gadget 1 - ATTINY85 Digispark -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="DIGISPARK">DIGISPARK</h3>
+                    <span class="text-neon-green font-bold">$2.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fielectrony.com%2Fwp-content%2Fuploads%2F2024%2F08%2Fat1-300x300-removebg-preview.png&f=1&nofb=1&ipt=b2a4b14418eeeb33ff05a56b7bf4b1591fe375d1c2871e40f1cb5346dc3d447d" alt="ATTINY85 Digispark" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Microcontrolador USB económico basado en ATtiny85. Popular para crear dispositivos HID personalizados, herramientas de seguridad y proyectos DIY. Compatible con Arduino IDE.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="2.00" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://ja.aliexpress.com/item/2040316211.html?srcSns=sns_Copy&spreadType=socialShare&bizType=ProductDetail&social_params=60850187613&aff_fcid=068ad08e35074b3aa21b42b7a7eb1b67-1753987796361-03790-_EHc2Toh&tt=MG&aff_fsk=_EHc2Toh&aff_platform=default&sk=_EHc2Toh&aff_trace_key=068ad08e35074b3aa21b42b7a7eb1b67-1753987796361-03790-_EHc2Toh&shareId=60850187613&businessType=ProductDetail&platform=AE&terminal_id=4f509e3f25b0476da3b5e75bef55b8e8&afSmartRedirect=y&gatewayAdapt=glo2jpn" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN ALIEXPRESS">COMPRAR EN ALIEXPRESS</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-micro">ATtiny85</span>
+                    <span class="tag tag-diy">DIY</span>
+                    <span class="tag tag-hid">HID</span>
+                </div>
+            </div>
+
+            <!-- Gadget 2 - ESP-WROOM-32 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="ESP-WROOM-32">ESP-WROOM-32</h3>
+                    <span class="text-neon-green font-bold">$8.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Frepository-images.githubusercontent.com%2F289585733%2Faca18380-f8fa-11ea-978f-b2706a3f3116&f=1&nofb=1&ipt=284354ed35814224766b6133472eb1283b4182ed0e7598afbf60c7203bd955c4" alt="ESP-WROOM-32" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Módulo WiFi/Bluetooth de bajo costo basado en ESP32. Ideal para prototipos IoT, proyectos de seguridad WiFi y desarrollo de herramientas personalizadas con Arduino IDE.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="8.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://a.co/d/82oaaQl" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-esp32">ESP32</span>
+                    <span class="tag tag-wifi">WiFi</span>
+                    <span class="tag tag-bluetooth">Bluetooth</span>
+                    <span class="tag tag-iot">IoT</span>
+                </div>
+            </div>
+
+            <!-- Gadget 3 - JSAUX USB Blocker -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="USB DATA BLOCKER">USB DATA BLOCKER</h3>
+                    <span class="text-neon-green font-bold">$12.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/USBBlockData.png" alt="JSAUX USB Data Blocker" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Adaptador de seguridad USB que bloquea la transferencia de datos, permitiendo solo carga eléctrica. Protege contra ataques Juice Jacking en puertos públicos de carga.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="12.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/877yAz9" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-security">Seguridad</span>
+                    <span class="tag tag-charge">Solo Carga</span>
+                    <span class="tag tag-portable">Portátil</span>
+                </div>
+            </div>
+
+            <!-- Gadget 4 - ESP32-C3 SUPER MINI -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="ESP32-C3 SUPER MINI">ESP32-C3 SUPER MINI</h3>
+                    <span class="text-neon-green font-bold">$13.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fzacetrex.com%2Fwp-content%2Fuploads%2F2024%2F02%2FESP32-Super-Mini.png&f=1&nofb=1&ipt=686213122664c29f90cdbae1a69084538face6cef83d4755b1623d102cf20d92" alt="ESP32-C3 SUPER MINI" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Módulo WiFi/Bluetooth de bajo consumo basado en RISC-V. Versión ultracompacta del ESP32 con soporte para Arduino IDE y MicroPython, ideal para proyectos IoT y de seguridad embebidos.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="13.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://a.co/d/evIJgMl" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-esp32">ESP32-C3</span>
+                    <span class="tag tag-wifi">WiFi/BLE</span>
+                    <span class="tag tag-riscv">RISC-V</span>
+                    <span class="tag tag-mini">Ultracompacto</span>
+                </div>
+            </div>
+
+            <!-- Gadget 5 - Paw Detector -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PAW DETECTOR">PAW DETECTOR</h3>
+                    <span class="text-neon-green font-bold">$15.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/PawDetector.png" alt="Paw Detector" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo de seguridad portátil que detecta cables USB maliciosos. Identifica modificaciones ocultas, inyección de datos y dispositivos de hardware peligrosos antes de que comprometan tu sistema.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="15.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://electroniccats.com/store/paw-detector" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN ELECTRONIC CATS">COMPRAR EN ELECTRONIC CATS</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-security">Seguridad</span>
+                    <span class="tag tag-detection">Detección</span>
+                    <span class="tag tag-portable">Portátil</span>
+                </div>
+            </div>
+
+            <!-- Gadget 6 - KLLJRFW Voice Detector -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="VOICE DETECTOR">VOICE DETECTOR</h3>
+                    <span class="text-neon-green font-bold">$15.09</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/KLLJRFW.png" alt="Voice Listen Detector" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Amplificador de audio portátil con micrófono sensible. Detecta sonidos ambientales y conversaciones lejanas, ideal para pruebas de privacidad y detección de dispositivos de escucha.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="15.09">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/8w05dbn" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-audio">Audio</span>
+                    <span class="tag tag-detector">Detector</span>
+                    <span class="tag tag-microphone">Micrófono</span>
+                    <span class="tag tag-security">Privacidad</span>
+                </div>
+            </div>
+
+            <!-- Gadget 7 - M5Stack -->
+            <!-- URL: https://shop.m5stack.com/products/m5stickc-plus2-esp32-mini-iot-development-kit-->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="M5STACK">M5STACK</h3>
+                    <span class="text-neon-green font-bold">$19.95</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.moddable.com%2Fdocumentation%2Fassets%2Fdevices%2Fm5stick-cplus.png&f=1&nofb=1&ipt=ca9647d25b831a44450727456dd317a6f03c92e2267dd7796773675110c5812d" alt="M5Stack" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Plataforma modular de desarrollo IoT con pantalla integrada. Basado en ESP32, ideal para prototipado rápido, proyectos DIY y herramientas de seguridad personalizadas.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="19.95">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/9lYiyb5" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-iot">IoT</span>
+                    <span class="tag tag-esp32">ESP32</span>
+                    <span class="tag tag-display">Pantalla</span>
+                    <span class="tag tag-diy">Prototipado</span>
+                </div>
+            </div>
+
+            <!-- Gadget 8 - G8 Elite Camera Detector -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="G8 ELITE">G8 ELITE</h3>
+                    <span class="text-neon-green font-bold">$20.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/Detectoresdecámara.png" alt="G8 Elite Camera Detector" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Detector portátil de cámaras ocultas que localiza lentes réflex mediante luz LED y filtros ópticos. Identifica dispositivos de vigilancia en habitaciones, vestuarios y áreas privadas.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="20.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://a.co/d/b11Voqi" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-detector">Detector</span>
+                    <span class="tag tag-camera">Cámaras</span>
+                    <span class="tag tag-privacy">Privacidad</span>
+                    <span class="tag tag-portable">Portátil</span>
+                </div>
+            </div>
+
+            <!-- Gadget 9 - Thetis Pro-C Security Key -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="THETIS PRO-C">THETIS PRO-C</h3>
+                    <span class="text-neon-green font-bold">$26.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic1.xdaimages.com%2Fwordpress%2Fwp-content%2Fuploads%2F2024%2F05%2Ffile.png&f=1&nofb=1&ipt=0a4f9cff1b60c73442628f6716d5c560b95680e7c16ebfb77316f3285474da31" alt="Thetis Pro-C Security Key" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Clave de seguridad FIDO2/WebAuthn con conexión USB-C. Proporciona autenticación de dos factores sin contraseña, compatible con los principales navegadores y servicios en línea.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="26.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/cglFdwy" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usbc">USB-C</span>
+                    <span class="tag tag-fido2">FIDO2</span>
+                    <span class="tag tag-webauthn">WebAuthn</span>
+                    <span class="tag tag-2fa">2FA</span>
+                </div>
+            </div>
+
+            <!-- Gadget 10 - HELTEC LORA v3 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="HELTEC LORA V3">HELTEC LORA V3</h3>
+                    <span class="text-neon-green font-bold">$28.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/HELTECLORAv3.png" alt="HELTEC LORA v3" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Placa de desarrollo con LoRa, WiFi y Bluetooth integrados basada en ESP32. Incluye pantalla OLED, GPS y soporte para batería, ideal para proyectos IoT de largo alcance.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="28.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/bX0vMLo" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-lora">LoRa</span>
+                    <span class="tag tag-esp32">ESP32</span>
+                    <span class="tag tag-oled">OLED</span>
+                    <span class="tag tag-iot">IoT</span>
+                </div>
+            </div>
+
+            <!-- Gadget 11 - Redkey USB -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="REDKEY USB">REDKEY USB</h3>
+                    <span class="text-neon-green font-bold">$35.95</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/Redkey.png" alt="Redkey USB" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Solución segura y económica para borrado definitivo de datos. Elimina información sensible de dispositivos con solo unos clics, protegiéndote contra accesos no autorizados a tus datos personales cuando reciclas o vendes equipos.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="35.95">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://redkeyusb.com/products/redkey-usb" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN REDKEY">COMPRAR EN REDKEY</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-security">Seguridad</span>
+                    <span class="tag tag-charge">Solo Carga</span>
+                    <span class="tag tag-portable">Portátil</span>
+                </div>
+            </div>
+
+            <!-- Gadget 12 - Hunter Cat -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="HUNTER CAT">HUNTER CAT</h3>
+                    <span class="text-neon-green font-bold">$49.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://lab401.com/cdn/shop/products/HunterCat---Skimmer-Detector_520x276.png?v=1587035198" alt="Hunter Cat" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Detector portátil de skimmers RFID/NFC diseñado para encontrar dispositivos fraudulentos en cajeros automáticos y terminales de pago. Protege contra el robo de datos de tarjetas de crédito y identificación.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="49.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://lab401.com/es/collections/all-products/products/hunter-cat-card-skimmer-detector" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN LAB401">COMPRAR EN LAB401</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">RFID</span>
+                    <span class="tag tag-nfc">NFC</span>
+                    <span class="tag tag-security">Seguridad</span>
+                    <span class="tag tag-detection">Detección</span>
+                </div>
+            </div>
+
+            <!-- Gadget 13 - Gialer LTE Programmer Kit -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="GIALER LTE">GIALER LTE</h3>
+                    <span class="text-neon-green font-bold">$56.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/gialerLTE.png" alt="Gialer LTE Programmer Kit" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Kit completo para programación de tarjetas SIM LTE/4G. Incluye lectores programables, software y adaptadores para operaciones de clonación y pruebas de seguridad en redes celulares.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="56.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/4IdZbKj" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-lte">LTE/4G</span>
+                    <span class="tag tag-sim">SIM</span>
+                    <span class="tag tag-programmer">Programador</span>
+                    <span class="tag tag-cellular">Celular</span>
+                </div>
+            </div>
+
+            <!-- Gadget 14 - Wi-Fi Nugget -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.3s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="WI-FI DEAUTHER">WI-FI Nugget</h3>
+                    <span class="text-neon-green font-bold">$59.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.shopify.com%2Fs%2Ffiles%2F1%2F2779%2F8142%2Fproducts%2Fsignal-2021-09-30-162945_1024x1024.jpg%3Fv%3D1633047834&f=1&nofb=1&ipt=7a5fb7994f4637f34a4e191eadb92a9ac9764df6cafc031a53c28b1491110b2c" alt="Wi-Fi Deauther" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo portátil basado en ESP8266/ESP32 para pruebas de seguridad Wi-Fi. Permite enviar paquetes de deautenticación, realizar beacon floods, crear AP falsos y analizar redes cercanas. Ideal para auditorías de seguridad.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="59.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://retia.io/products/wi-fi-nugget-assembled" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR AHORA">COMPRAR AHORA</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-wifi">Wi-Fi 2.4GHz</span>
+                    <span class="tag tag-rfid">802.11 b/g/n</span>
+                    <span class="tag tag-sdr">Pentesting</span>
+                    <span class="tag tag-esp">ESP8266</span>
+                </div>
+            </div>
+
+            <!-- Gadget 15 - DSTIKE Deauther Watch V3 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="DEAUTHER WATCH V3">DEAUTHER WATCH V3</h3>
+                    <span class="text-neon-green font-bold">$59.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fshop.mtoolstec.com%2Fwp-content%2Fuploads%2F2022%2F08%2Ficon-daw-v3.png&f=1&nofb=1&ipt=7478c6cd4b836c0f491c5636848de9e4c9940c86f541ced57b5eac574917f550" alt="DSTIKE Deauther Watch V3" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Reloj inteligente con capacidades WiFi de seguridad integradas. Permite pruebas de red mediante paquetes de deautenticación, beacon floods y análisis de redes WiFi cercanas.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="59.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/eohGUpm" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-wifi">WiFi</span>
+                    <span class="tag tag-deauth">Deauther</span>
+                    <span class="tag tag-watch">Reloj</span>
+                    <span class="tag tag-security">Pentesting</span>
+                </div>
+            </div>
+
+            <!-- Gadget X - Kiisu v4a Development Board -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="KIISU V4A">KIISU V4A</h3>
+                    <span class="text-neon-green font-bold">$70.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://store.rainwalker.ee/cdn/shop/files/KIISU4a.png?v=1750085224&width=600" alt="Kiisu v4a Development Board" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Placa de desarrollo todo-en-uno con ESP32-S3, pantalla OLED, teclado físico y soporte para batería. Ideal para crear herramientas portátiles de seguridad WiFi y proyectos IoT avanzados.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="70.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://store.rainwalker.ee/products/kiisu-v4" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN RAINWALKER">COMPRAR EN RAINWALKER</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-esp32">ESP32-S3</span>
+                    <span class="tag tag-oled">OLED</span>
+                    <span class="tag tag-keyboard">Teclado</span>
+                    <span class="tag tag-portable">Portátil</span>
+                </div>
+            </div>
+
+            <!-- Gadget 16 - UBERTOOTH One -->
+            <!-- URL: https://shop.hak5.org/products/ubertooth-one -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="UBERTOOTH ONE">UBERTOOTH ONE</h3>
+                    <span class="text-neon-green font-bold">$79.41</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/UBERTOOTH.png" alt="UBERTOOTH One" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta de desarrollo Bluetooth de código abierto para sniffing y análisis de tráfico. Permite monitorizar conexiones Bluetooth Low Energy (BLE) y Classic para pruebas de seguridad.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="79.41">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/b8xsYzD" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-bluetooth">Bluetooth</span>
+                    <span class="tag tag-ble">BLE</span>
+                    <span class="tag tag-sniffing">Sniffing</span>
+                    <span class="tag tag-opensource">Open Source</span>
+                </div>
+            </div>
+
+            <!-- Gadget 17 - Pwnagotchi -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PWNAGOTCHI">PWNAGOTCHI</h3>
+                    <span class="text-neon-green font-bold">$96.95</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fphreakboutique.com%2Fcdn%2Fshop%2Ffiles%2Fgreymodernsmartphoneinstagrampost_2000x1600px_6.png%3Fv%3D1690351039&f=1&nofb=1&ipt=f8517d53077b09db6ee5850a1c95b0d1b96df998fda021a99e9bdfe9022d1acf" alt="Pwnagotchi" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo de seguridad Wi-Fi portátil con IA que aprende de su entorno. Automáticamente captura handshakes WPA mientras mejora sus habilidades mediante aprendizaje por refuerzo.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="96.95">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://www.pwnagotchi.com/products/pwnagotchi" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN PWNAGOTCHI">COMPRAR EN PWNAGOTCHI</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-wifi">Wi-Fi</span>
+                    <span class="tag tag-ai">IA</span>
+                    <span class="tag tag-security">WPA</span>
+                    <span class="tag tag-learning">Aprendizaje</span>
+                </div>
+            </div>
+
+            <!-- Gadget 18 - Rubber Ducky -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.2s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="USB RUBBER DUCKY">USB RUBBER DUCKY</h3>
+                    <span class="text-neon-green font-bold">$100.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi0.wp.com%2Fpayload.pl%2Fwp-content%2Fuploads%2F2020%2F08%2Fhak5-usb-rubber-ducky-transparent.png%3Ffit%3D800%252C800%26ssl%3D1&f=1&nofb=1&ipt=66526d6f410854f22b6ce2a809903d36f0aa0e76e0a555a3a42bb05cc6145a8a" alt="USB Rubber Ducky" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta de inyección de teclado que se hace pasar por un dispositivo USB estándar pero ejecuta scripts de ataque preprogramados.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="100.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://shop.hak5.org/products/usb-rubber-ducky" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-wifi">Inyección</span>
+                    <span class="tag tag-sdr">Scripting</span>
+                </div>
+            </div>
+
+            <!-- Gadget 19 - Shark Jack -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="SHARK JACK">SHARK JACK</h3>
+                    <span class="text-neon-green font-bold">$100.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/shark-jack.png" alt="Shark Jack" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta de penetración cableada portátil con activación por cable. Ejecuta automáticamente payloads personalizados al conectarse a una red, ideal para pruebas de seguridad físicas.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="100.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/collections/2025-best-sellers/products/shark-jack" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">Ethernet</span>
+                    <span class="tag tag-wifi">Payloads</span>
+                    <span class="tag tag-sdr">Automation</span>
+                    <span class="tag tag-stealth">Cable Trigger</span>
+                </div>
+            </div>
+
+            <!-- Gadget 20 - Kingston IronKey Vault Privacy 50 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="IRONKEY VAULT 50">IRONKEY VAULT 50</h3>
+                    <span class="text-neon-green font-bold">$123.02</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.inet.se%2Fproduct%2F1600x900%2F5306532_0.jpg&f=1&nofb=1&ipt=70502ef6238eaea9a561da65fd2c919bca97212e671dc0b0603c860f073f5484" alt="Kingston IronKey Vault 50" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Unidad USB cifrada con hardware FIPS 140-2 Nivel 3. Ofrece protección con contraseña compleja, cifrado AES de 256 bits y autoborrado ante intentos de intrusión.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="123.02">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/6h6unOS" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB 3.0</span>
+                    <span class="tag tag-encryption">AES-256</span>
+                    <span class="tag tag-fips">FIPS 140-2</span>
+                    <span class="tag tag-security">Cifrado</span>
+                </div>
+            </div>
+
+            <!-- Gadget 21 - IODD ST400 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="IODD ST400">IODD ST400</h3>
+                    <span class="text-neon-green font-bold">$124.95</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fen.iodd.kr%2Fwiki%2Fimages%2Fthumb%2F8%2F8a%2FST400-020.png%2F670px-ST400-020.png&f=1&nofb=1&ipt=9f60ac8ba1ff51c4b5689cfe95e6cfbd438dcfd2edbdeb0d9c46c1cf3f9a005e" alt="IODD ST400" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Caja USB 2.5" con emulación avanzada de medios. Permite cargar múltiples imágenes ISO/IMG, cambiar entre ellas dinámicamente y funcionar como dispositivo de arranque USB o disco duro virtual.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="124.95">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/bagM4F3" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB 3.0</span>
+                    <span class="tag tag-storage">2.5"</span>
+                    <span class="tag tag-iso">ISO Emulation</span>
+                    <span class="tag tag-boot">Bootable</span>
+                </div>
+            </div>
+
+            <!-- Gadget 22 - Chameleon Ultra -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="CHAMELEON ULTRA">CHAMELEON ULTRA</h3>
+                    <span class="text-neon-green font-bold">$129.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://lab401.com/cdn/shop/files/Chameleon-Ultra-MIFARE-Cracking-Tool_520x520.png?v=1691595167" alt="Chameleon Ultra" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta profesional de emulación y auditoría RFID con soporte para MIFARE Classic, NFC y otras tecnologías. Permite clonar, analizar y emular tarjetas de acceso para pruebas de seguridad.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="129.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://lab401.com/es/collections/all-products/products/chameleon-ultra" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN LAB401">COMPRAR EN LAB401</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">RFID</span>
+                    <span class="tag tag-nfc">NFC</span>
+                    <span class="tag tag-mifare">MIFARE</span>
+                    <span class="tag tag-security">Pentesting</span>
+                </div>
+            </div>
+
+            <!-- Gadget 23 - Circuitmess: Chatter -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="CHATTER">CHATTER</h3>
+                    <span class="text-neon-green font-bold">$129.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.shopify.com%2Fs%2Ffiles%2F1%2F0552%2F3269%2F2430%2Ffiles%2Fstem-roadmap-chatter.webp&f=1&nofb=1&ipt=205405d7417acd888e5b69e1f032c7bc12d186f917de8eb96b84d41140714204" alt="Circuitmess: Chatter" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Kit educativo de radio digital que enseña principios de criptografía y comunicaciones seguras. Construye tu propio dispositivo de mensajería encriptada con pantalla OLED y teclado físico.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="129.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/grxwBSK" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-crypto">Criptografía</span>
+                    <span class="tag tag-radio">Radio</span>
+                    <span class="tag tag-oled">OLED</span>
+                    <span class="tag tag-education">Educativo</span>
+                </div>
+            </div>
+
+            <!-- Gadget 24 - Plunder Bug LAN Tap -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PLUNDER BUG">PLUNDER BUG</h3>
+                    <span class="text-neon-green font-bold">$130.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.zerodaysnoop.com%2Fwp-content%2Fuploads%2F2020%2F08%2Fplunder-bug-lan-tap.png&f=1&nofb=1&ipt=ebfce3bb8d90b483f0504219b89b1674e327ef243e95ea869cb386dc46803343" alt="Plunder Bug LAN Tap" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo de intercepción de red cableada que se conecta discretamente entre cables Ethernet. Captura todo el tráfico de red para análisis posterior con herramientas como Wireshark.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="130.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/products/bug" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">Ethernet</span>
+                    <span class="tag tag-wifi">Packet Capture</span>
+                    <span class="tag tag-sdr">Network Tap</span>
+                    <span class="tag tag-stealth">Stealth</span>
+                </div>
+            </div>
+
+            <!-- Gadget 25 - Packet Squirrel Mark II -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PACKET SQUIRREL">PACKET SQUIRREL</h3>
+                    <span class="text-neon-green font-bold">$130.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fshop.hak5.org%2Fcdn%2Fshop%2Ffiles%2Fsquirrelmk2_flat_halfres_600x.png%3Fv%3D1689105958&f=1&nofb=1&ipt=ccdfe0b0bac64c0cb53677c680963dfb620ee248545f5d47d41c29368eee1112" alt="Packet Squirrel Mark II" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo de red portátil tipo "man-in-the-middle" para captura y modificación de tráfico. Ejecuta scripts automatizados, VPN silenciosas y captura de paquetes en redes cableadas.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="130.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/products/packet-squirrel-mark-ii" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">Ethernet</span>
+                    <span class="tag tag-wifi">Packet Capture</span>
+                    <span class="tag tag-sdr">MITM</span>
+                    <span class="tag tag-vpn">VPN</span>
+                </div>
+            </div>
+
+            <!-- Gadget 26 - Proxmark3 RDV2 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PROXMARK3 RDV2">PROXMARK3 RDV2</h3>
+                    <span class="text-neon-green font-bold">$139.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.hackmod.de%2FWebRoot%2FStore12%2FShops%2F78218349%2F5B00%2FE700%2F923F%2FEF27%2FA7A2%2F0A0C%2F6D05%2F0F98%2FProxmark3_Easy_kaufen.png&f=1&nofb=1&ipt=26430367548f0ae50ccc69355861d9c9d4ee9b6abc5a93db2621a6e7e2b3ac22" alt="Proxmark3 RDV2" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta profesional para investigación y pruebas de seguridad RFID. Compatible con múltiples protocolos (LF/HF), permite leer, clonar y emular tags RFID, ideal para auditorías de seguridad.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="139.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/dCkr2E1" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">RFID</span>
+                    <span class="tag tag-nfc">NFC</span>
+                    <span class="tag tag-security">Pentesting</span>
+                    <span class="tag tag-pro">Profesional</span>
+                </div>
+            </div>
+
+            <!-- Gadget 27 - Proxgrind ChameleonTiny -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="CHAMELEONTINY">CHAMELEONTINY</h3>
+                    <span class="text-neon-green font-bold">$143.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://lab401.com/cdn/shop/products/Chameleon-Tiny---RFID-Emulator_420x613.png?v=1607368592" alt="Proxgrind ChameleonTiny" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Emulador RFID compacto compatible con múltiples protocolos (125kHz y 13.56MHz). Ideal para pruebas de seguridad física, clonación de tarjetas de acceso y auditorías de sistemas RFID.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="143.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://lab401.com/es/collections/all-products/products/chameleontiny" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN LAB401">COMPRAR EN LAB401</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">RFID</span>
+                    <span class="tag tag-emulator">Emulador</span>
+                    <span class="tag tag-125khz">125kHz</span>
+                    <span class="tag tag-13mhz">13.56MHz</span>
+                </div>
+            </div>
+
+            <!-- Gadget 28 - Mxzzand Lector MSR605X USB -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="MSR605X">MSR605X</h3>
+                    <span class="text-neon-green font-bold">$153.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftagtixrfid.com%2Fcdn%2Fshop%2Ffiles%2FMSR605_hotspots.png%3Fv%3D1725506850%26width%3D2400&f=1&nofb=1&ipt=9b57a83de74fb68ed3ee1925770a9f8035273f806ab97acc8cff2d23f91ea39d" alt="Mxzzand MSR605X" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Lector/grabador profesional de bandas magnéticas (pistas 1/2/3) con interfaz USB. Compatible con tarjetas de crédito, identificación y sistemas de control de acceso. Incluye software de utilidad.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="153.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/8VIyIcB" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-magnetic">Banda Magnética</span>
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-reader">Lector/Grabador</span>
+                    <span class="tag tag-security">Control Acceso</span>
+                </div>
+            </div>
+
+            <!-- Gadget 29 - USBKill V4 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="USBKILL V4">USBKILL V4</h3>
+                    <span class="text-neon-green font-bold">$156.09</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://lab401.com/cdn/shop/products/USBKill-V4-ProKit-Inside_520x520.png?v=1599729289" alt="USBKill V4" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo de seguridad anti-forense que protege contra ataques a través de puertos USB. Descarga capacitores de alto voltaje para limpiar datos sensibles de manera segura cuando se detecta intrusión física.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="156.09">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://lab401.com/es/collections/all-products/products/usbkill-v4-pro-kit" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN LAB401">COMPRAR EN LAB401</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-security">Anti-Forense</span>
+                    <span class="tag tag-dataprotection">Protección</span>
+                    <span class="tag tag-destruction">Wipe</span>
+                </div>
+            </div>
+
+            <!-- Gadget 30 - O.MG Cable -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="O.MG CABLE">O.MG CABLE</h3>
+                    <span class="text-neon-green font-bold">$180.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Flab401.com%2Fcdn%2Fshop%2Fproducts%2F2023---OMG-Cable---USB-A-to-MicroUSB---Elite_1024x1024%402x.png%3Fv%3D1692886952&f=1&nofb=1&ipt=bafdb7e7d2a4c96182a5480551d39f6852f574fd9185f0d9de208e25a2f69a59" alt="O.MG Cable" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Cable USB modificado con capacidades inalámbricas ocultas. Permite acceso remoto, inyección de comandos y control completo del dispositivo conectado, todo mientras parece un cable normal.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="180.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/collections/2025-best-sellers/products/omg-cable?variant=39808316047473" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-wifi">Wi-Fi</span>
+                    <span class="tag tag-sdr">Inyección</span>
+                    <span class="tag tag-stealth">Oculto</span>
+                </div>
+            </div>
+
+            <!-- Gadget 31 - Key Croc -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="KEY CROC">KEY CROC</h3>
+                    <span class="text-neon-green font-bold">$200.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/key-croc.png" alt="Key Croc" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta de registro de pulsaciones (keystroke injection) disfrazada de adaptador USB. Graba tecleo, inyecta comandos y se controla remotamente vía WiFi, todo mientras parece un cable de teclado normal.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="200.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/collections/2025-best-sellers/products/key-croc" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-wifi">Wi-Fi</span>
+                    <span class="tag tag-keyboard">Keylogger</span>
+                    <span class="tag tag-stealth">Oculto</span>
+                </div>
+            </div>
+
+            <!-- Gadget 32 - LAN Turtle -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="LAN TURTLE">LAN TURTLE</h3>
+                    <span class="text-neon-green font-bold">$209.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/lan-turtle.png" alt="LAN Turtle" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta de administración remota y acceso encubierto que se disfraza de adaptador Ethernet. Permite acceso SSH, VPN, tunneling de tráfico y ejecución de payloads en redes cableadas.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="209.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/products/lan-turtle" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">Ethernet</span>
+                    <span class="tag tag-wifi">SSH</span>
+                    <span class="tag tag-sdr">VPN</span>
+                    <span class="tag tag-tunnel">Tunneling</span>
+                </div>
+            </div>
+
+            <!-- Gadget 33 - SharkTap Network Sniffer -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="SHARKTAP">SHARKTAP</h3>
+                    <span class="text-neon-green font-bold">$219.95</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fmidbittech.com%2Ffiles%2FBYP%2FMain.png&f=1&nofb=1&ipt=d07909301e8ba4fb0b15f98aed0c1bc03fcf1261286a5542ad5e4b12ca037287" alt="SharkTap Network Sniffer" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo de red pasivo para monitoreo y captura de tráfico Gigabit Ethernet. Permite análisis de paquetes sin interrumpir el flujo de datos, ideal para auditorías de seguridad y troubleshooting.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="219.95">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/e8hoCWN" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-ethernet">Gigabit</span>
+                    <span class="tag tag-sniffer">Sniffer</span>
+                    <span class="tag tag-passive">Pasivo</span>
+                    <span class="tag tag-security">Auditoría</span>
+                </div>
+            </div>
+
+            <!-- Gadget 34 - Flipper Zero -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.1s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="FLIPPER ZERO">FLIPPER ZERO</h3>
+                    <span class="text-neon-green font-bold">$229.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fstatic.tildacdn.com%2Ftild6361-6634-4361-b433-396433333164%2Ffpr-001_light_web_2_.png&f=1&nofb=1&ipt=2d9e3b21cbdeb6dd059ef1befdb04e55a040e896d72fa68da07a9e4a02c21f2c" alt="Flipper Zero" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Dispositivo portátil para pruebas de penetración y desarrollo de herramientas. Compatible con RFID, Bluetooth, GPIO, NFC y más.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="229.00" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://shop.flipperzero.one/?_gl=1*hi7occ*_ga*ODk1MjQ5NjM3LjE3NTQwNjY1MDY.*_ga_GM78S6JK0K*czE3NTQwNjY1MDYkbzEkZzAkdDE3NTQwNjY1MDYkajYwJGwwJGgw" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN FLIPPER">COMPRAR EN FLIPPER</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">RFID</span>
+                    <span class="tag tag-wifi">Bluetooth</span>
+                    <span class="tag tag-sdr">GPIO</span>
+                    <span class="tag tag-usb">NFC</span>
+                </div>
+            </div>
+            
+            <!-- Gadget 35 - Bash Bunny -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="BASH BUNNY">BASH BUNNY</h3>
+                    <span class="text-neon-green font-bold">$250.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fdownloads.hak5.org%2Fassets%2Fimages%2Fproductphotos%2Fbash_bunny_mk2.png&f=1&nofb=1&ipt=6639fb66c046aa79e30c3a99485f47f8cc1ecd133aba635800bd547782be3be2" alt="Bash Bunny" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta de ataque USB que se hace pasar por un dispositivo de almacenamiento masivo o teclado para ejecutar payloads automatizados.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="250.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/collections/2025-best-sellers/products/bash-bunny" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-usb">USB</span>
+                    <span class="tag tag-wifi">Payloads</span>
+                    <span class="tag tag-sdr">Automation</span>
+                </div>
+            </div>
+
+            <!-- Gadget 36 - Screen Crab -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="SCREEN CRAB">SCREEN CRAB</h3>
+                    <span class="text-neon-green font-bold">$270.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/screen-crab.png" alt="Screen Crab" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Interceptor HDMI portátil que captura pantalla y audio en tiempo real. Graba contenido de presentaciones, transmisiones y videoconferencias de forma discreta con almacenamiento local.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="270.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/collections/2025-best-sellers/products/screen-crab" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-hdmi">HDMI</span>
+                    <span class="tag tag-video">Video</span>
+                    <span class="tag tag-audio">Audio</span>
+                    <span class="tag tag-stealth">Discreto</span>
+                </div>
+            </div>
+
+            <!-- Gadget 37 - Punkt. MP02 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PUNKT MP02">PUNKT MP02</h3>
+                    <span class="text-neon-green font-bold">$299.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.mobilitysweden.com%2F2020%2F10%2Fpunkt-mp02-buy-online-600x630.png&f=1&nofb=1&ipt=f7822813ed10696dd3e071f3765473762a94f16abd07cdf808f20540995f34b2" alt="Punkt MP02" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Teléfono minimalista de enfoque con cifrado PGP integrado. Soporta llamadas 4G, mensajería segura y diseño discreto para comunicación privada sin distracciones digitales.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="299.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://amzn.eu/d/90BEHLi" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-4g">4G LTE</span>
+                    <span class="tag tag-encryption">PGP</span>
+                    <span class="tag tag-minimalist">Minimalista</span>
+                    <span class="tag tag-privacy">Privacidad</span>
+                </div>
+            </div>
+
+            <!-- Gadget 38 - Wifi Pineaple Mark II -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="WIFI PINEAPPLE">WIFI PINEAPPLE</h3>
+                    <span class="text-neon-green font-bold">$326.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/wifiPineapleIcono.png" alt="WiFi Pineapple Mark VII" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Plataforma profesional de auditoría Wi-Fi con soporte dual-band (2.4GHz/5GHz). Permite ataques avanzados, honeypots, MITM y análisis de redes con módulos integrados.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="326.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://hak5.org/products/wifi-pineapple?variant=32019576094833" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN HAK5">COMPRAR EN HAK5</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-wifi">Wi-Fi 6</span>
+                    <span class="tag tag-rfid">Dual-Band</span>
+                    <span class="tag tag-sdr">Pentesting</span>
+                    <span class="tag tag-usb">Ethernet</span>
+                </div>
+            </div>
+
+            <!-- Gadget 39 - HackRF One -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.4s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="HACKRF ONE">HACKRF ONE</h3>
+                    <span class="text-neon-green font-bold">$369.05</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.shopify.com%2Fs%2Ffiles%2F1%2F2175%2F8571%2Fproducts%2FHackRF-One-Cheap-SDR-Antenna_1024x1024%402x.png%3Fv%3D1625148342&f=1&nofb=1&ipt=2bbd6f7ca926a9854d9de4e78055e9e8b758f0020a0ba931ef11b4ef73bbb08b" alt="HackRF One" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Transceptor de radio definido por software (SDR) que cubre de 1 MHz a 6 GHz. Ideal para investigación de RF y desarrollo de protocolos.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="369.05">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <!-- LINK SECUNDARIO: https://amzn.eu/d/4FMEguG -->
+                    <a href="https://lab401.com/es/collections/all-products/products/hackrf-one" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN GSG">COMPRAR EN GSG</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-sdr">SDR</span>
+                    <span class="tag tag-rfid">RF</span>
+                    <span class="tag tag-wifi">1MHz-6GHz</span>
+                </div>
+            </div>
+            
+            <!-- Gadget 40 - Proxmark3 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.5s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="PROXMARK3">PROXMARK3</h3>
+                    <span class="text-neon-green font-bold">$398.09</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://lab401.com/cdn/shop/products/Proxmark-3-RDV-4.1-New-Antenna-Front_520x419.png?v=1567146103" alt="Proxmark3" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Herramienta profesional para pruebas de seguridad RFID. Soporta HF/LF, clonación de tarjetas, emulación y análisis de protocolos.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="398.09">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://lab401.com/es/products/proxmark-3-rdv4" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN PROXMARK">COMPRAR EN PROXMARK3</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">RFID</span>
+                    <span class="tag tag-sdr">HF/LF</span>
+                    <span class="tag tag-usb">Clonación</span>
+                </div>
+            </div>
+
+            <!-- Gadget 41 - DiscoverIt DefCon DD1206 -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="DEFCON DD1206">DEFCON DD1206</h3>
+                    <span class="text-neon-green font-bold">$549.99</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="img/DiscoverItDefConDD1206.png" alt="DiscoverIt DefCon DD1206" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Escáner de radiofrecuencia profesional multibanda con análisis espectral en tiempo real. Detecta y analiza señales desde 100kHz hasta 6GHz, ideal para operaciones de seguridad avanzada.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="549.99">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://a.co/d/1vHCedy" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN AMAZON">COMPRAR EN AMAZON</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rf">RF 6GHz</span>
+                    <span class="tag tag-spectrum">Analizador</span>
+                    <span class="tag tag-professional">Profesional</span>
+                    <span class="tag tag-security">Seguridad</span>
+                </div>
+            </div>
+
+            <!-- Gadget 42 - UHFKill -->
+            <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold text-white glitch-effect" data-text="UHFKILL">UHFKILL</h3>
+                    <span class="text-neon-green font-bold">$1,495.00</span>
+                </div>
+                <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="https://lab401.com/cdn/shop/products/UHFKill-1_520x520.png?v=1634725826" alt="UHFKill" class="w-full h-full object-contain">
+                </div>
+                <p class="text-gray-400 text-sm mb-4">
+                    Sistema profesional de inhibición RFID/UHF de largo alcance (hasta 30m). Diseñado para operaciones de seguridad que requieren desactivar dispositivos de rastreo, drones no autorizados y sistemas de identificación remota.
+                </p>
+                <div class="flex items-center justify-between mb-4">
+                    <label class="flex items-center cursor-pointer">
+                        <div class="toggle-switch mr-2">
+                            <input type="checkbox" class="gadget-toggle" data-price="1495.00">
+                            <span class="toggle-slider"></span>
+                        </div>
+                        <span class="text-gray-400 text-sm">Estado</span>
+                    </label>
+                    <a href="https://lab401.com/es/collections/all-products/products/uhfkill" target="_blank" class="text-ice-blue hover:text-neon-green text-sm glitch-effect" data-text="COMPRAR EN LAB401">COMPRAR EN LAB401</a>
+                </div>
+                <div class="flex flex-wrap">
+                    <span class="tag tag-rfid">UHF</span>
+                    <span class="tag tag-jammer">Inhibidor</span>
+                    <span class="tag tag-security">Profesional</span>
+                    <span class="tag tag-longrange">30m Alcance</span>
+                </div>
+            </div>
+        </div>
+        <br>
+        <!-- Tools Caseras Section -->
+        <div class="card rounded-lg p-5 shadow-lg" style="animation-delay: 0.6s;">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-bold text-white glitch-effect" data-text="TOOLS CASERAS">TOOLS CASERAS</h3>
+            </div>
+            <h4>Tool Hacking Wifi</h4>
+            <div class="mb-4 h-40 bg-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                <div class="text-center p-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-neon-green mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p class="text-gray-400 text-sm">Herramientas de hacking caseras y proyectos DIY para seguridad informática</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-center">
+                <a href="toolsCaseros/hackingWifi.html" class="px-6 py-2 bg-neon-green hover:bg-opacity-80 text-white font-bold rounded-lg transition-all flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    EXPLORAR
+                </a>
+            </div>
+            <div class="flex flex-wrap justify-center mt-4">
+                <span class="tag tag-wifi">WiFi</span>
+                <span class="tag tag-diy">DIY</span>
+                <span class="tag tag-security">Seguridad</span>
+                <span class="tag tag-hacking">Hacking</span>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 border-t border-gray-800 py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-500 text-sm mb-4 md:mb-0">
+                    <span class="uptime-counter">UPTIME: 427H</span>
+                    <span class="mx-2">|</span>
+                    <span>IP: 192.168.1.<span id="random-ip">x</span></span>
+                </div>
+                <div class="text-gray-500 text-sm">
+                    <span class="hidden-link" data-secret="decrypt">4A 6F 69 6E 20 74 68 65 20 63 6F 6C 6C 65 63 74 69 76 65</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Custom cursor
+        const cursor = document.querySelector('.custom-cursor');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        document.querySelectorAll('a, button, .gadget-toggle').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('active');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('active');
+            });
+        });
+        
+        document.addEventListener('click', () => {
+            cursor.classList.add('click');
+            setTimeout(() => {
+                cursor.classList.remove('click');
+            }, 300);
+        });
+        
+        // Random IP generator
+        document.getElementById('random-ip').textContent = Math.floor(Math.random() * 254) + 1;
+        
+        // Total counter functionality - sums all unpurchased items
+        const toggles = document.querySelectorAll('.gadget-toggle');
+        const totalCounter = document.querySelector('.total-counter');
+        
+        function calculateTotal() {
+            let total = 0;
+            toggles.forEach(toggle => {
+                if (!toggle.checked) {
+                    total += parseFloat(toggle.getAttribute('data-price'));
+                }
+            });
+            totalCounter.textContent = `${total.toFixed(2)}`;
+        }
+        
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', calculateTotal);
+        });
+        
+        // Initialize total
+        calculateTotal();
+        
+        // Secret message hover effect
+        const secretMessage = document.querySelector('.hidden-link');
+        
+        secretMessage.addEventListener('mouseenter', function() {
+            const hex = this.textContent.trim().split(' ');
+            let message = '';
+            
+            hex.forEach(h => {
+                message += String.fromCharCode(parseInt(h, 16));
+            });
+            
+            this.setAttribute('data-original', this.textContent);
+            this.textContent = message;
+        });
+        
+        secretMessage.addEventListener('mouseleave', function() {
+            this.textContent = this.getAttribute('data-original');
+        });
+        
+        // Animate cards on scroll
+        const animateOnScroll = () => {
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.3;
+                
+                if (cardPosition < screenPosition) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+    </script>
+</body>
+</html>
